@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>抖音博主管理系统</title>
+    <style>
+        /* 赛博背景样式 */
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            background: 
+                linear-gradient(rgba(0, 255, 231, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 231, 0.05) 1px, transparent 1px),
+                linear-gradient(rgba(0, 255, 231, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 231, 0.03) 1px, transparent 1px);
+            background-size: 
+                100px 100px,
+                100px 100px,
+                20px 20px,
+                20px 20px;
+            animation: gridMove 80s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+            100% { background-position: 1000px 1000px, 1000px 1000px, 200px 200px, 200px 200px; }
+        }
+
+        .cyber-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            mask-image: linear-gradient(
+                to right,
+                transparent 0%,
+                rgba(0,0,0,0.8) 10%,
+                rgba(0,0,0,0.8) 90%,
+                transparent 100%
+            );
+        }
+
+        .cyber-lines:before,
+        .cyber-lines:after {
+            content: '';
+            position: absolute;
+            background: linear-gradient(
+                45deg, 
+                transparent 20%, 
+                rgba(0, 255, 231, 0.4) 50%,
+                transparent 80%
+            );
+            width: 200%;
+            height: 200%;
+            animation: cyberGlow 8s linear infinite;
+            opacity: 0;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        }
+
+        .cyber-lines:after {
+            filter: hue-rotate(90deg);
+            animation-delay: -2s;
+            background: linear-gradient(
+                45deg, 
+                transparent 20%, 
+                rgba(85, 255, 255, 0.3) 50%,
+                transparent 80%
+            );
+        }
+
+        @keyframes cyberGlow {
+            0% {
+                transform: translate(-60%, -60%) rotate(45deg);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.8;
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(40%, 40%) rotate(45deg);
+                opacity: 0;
+            }
+        }
+
+        /* 基础样式 */
+        body {
+            background: #0f2027;
+            background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            margin: 0;
+            color: #e0e6ed;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1100px;
+            margin: 60px auto 0 auto;
+            background: rgba(20, 30, 48, 0.9);
+            border-radius: 18px;
+            box-shadow: 0 0 40px 5px #00ffe7a0, 0 0 0 2px #00ffe7 inset;
+            padding: 40px 40px 30px 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* 其余样式保持原有结构... */
+
+        /* 科技进度条 */
+        .tech-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 6px;
+            background: transparent;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .tech-bar .line {
+            position: absolute;
+            height: 100%;
+            width: 120px;
+            background: linear-gradient(90deg, transparent, #00ffe7, transparent);
+            opacity: 0.7;
+            animation: moveLine 2.5s linear infinite;
+        }
+
+        .tech-bar .line2 {
+            left: 40vw;
+            animation-delay: 1.2s;
+            opacity: 0.5;
+        }
+
+        .tech-bar .line3 {
+            left: 70vw;
+            animation-delay: 2s;
+            opacity: 0.3;
+        }
+
+        @keyframes moveLine {
+            0% { left: -120px; }
+            100% { left: 100vw; }
+        }
+
+        /* 输入组件样式 */
+        .input-group {
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-grid h2 {
+            grid-column: span 2;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: inline-block;
+            width: 120px;
+            font-weight: bold;
+            color: #00ffe7;
+            text-shadow: 0 0 4px #00ffe7;
+        }
+
+        input, select {
+            padding: 8px 12px;
+            width: 300px;
+            border: 2px solid #00ffe7;
+            border-radius: 8px;
+            background: rgba(10, 20, 30, 0.8);
+            color: #fff;
+            outline: none;
+            font-size: 16px;
+            box-shadow: 0 0 10px #00ffe750;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, select:focus {
+            border: 2px solid #00c3ff;
+            box-shadow: 0 0 20px #00c3ff80;
+        }
+
+        /* 按钮样式 */
+
+        .sort-bar {
+            margin-bottom: 50px;
+        }
+        button {
+            padding: 10px 32px;
+            background: linear-gradient(90deg, #00ffe7 0%, #00c3ff 100%);
+            color: #0f2027;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px #00ffe780, 0 0 8px #00c3ff60;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        button:hover {
+            background: linear-gradient(90deg, #00c3ff 0%, #00ffe7 100%);
+            color: #fff;
+            box-shadow: 0 0 40px #00ffe7, 0 0 16px #00c3ff;
+        }
+
+        /* 数据表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background: rgba(10, 20, 30, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px #00ffe740;
+            table-layout: fixed;
+        }
+
+        th, td {
+            border: 1px solid #00ffe740;
+            padding: 10px 8px;
+            text-align: center;
+            vertical-align: middle;
+            width: 10%;
+            box-sizing: border-box;
+        }
+
+        .action-cell {
+            text-align: center;
+        }
+
+        th {
+            background: linear-gradient(90deg, #00ffe7 0%, #00c3ff 100%);
+            color: #0f2027;
+            font-weight: bold;
+            text-shadow: 0 0 4px #fff;
+        }
+
+        tr {
+            transition: background 0.2s;
+        }
+
+        tr:hover {
+            background: rgba(0,255,231,0.08);
+        }
+
+        /* 粒子效果 */
+        .particles {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100vw;
+            height: 80px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            bottom: 0;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00ffe7, #00c3ff);
+            opacity: 0.7;
+            animation: floatUp 4s linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 0.7; }
+            80% { opacity: 1; }
+            100% { transform: translateY(-80px) scale(0.7); opacity: 0; }
+        }
+
+        /* 删除按钮特效 */
+        .delete-btn {
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #ff2a6d 0%, #7d2fff 100%);
+            color: #fff;
+            border: 1px solid #ff61fa;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 15px #ff2a6d80, 
+                       inset 0 0 5px rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px #ff2a6d;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #ff1a5e 0%, #6d1fff 100%);
+            box-shadow: 0 0 25px #ff2a6d, 
+                       inset 0 0 10px rgba(255,255,255,0.3);
+            transform: translateY(-2px) scale(1.02);
+            animation: btnGlow 1.5s infinite;
+        }
+
+        @keyframes btnGlow {
+            0% { box-shadow: 0 0 15px #ff00ff, inset 0 0 5px rgba(255, 0, 255, 0.2); }
+            50% { box-shadow: 0 0 30px #ff00ff, inset 0 0 10px rgba(255, 0, 255, 0.3); }
+            100% { box-shadow: 0 0 15px #ff00ff, inset 0 0 5px rgba(255, 0, 255, 0.2); }
+        }
+
+        .action-cell {
+            width: 100px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    <div class="cyber-lines"></div>
+    
+    <div class="tech-bar">
+        <div class="line"></div>
+        <div class="line line2"></div>
+        <div class="line line3"></div>
+    </div>
+    
+    <div class="container">
+        <div class="form-grid">
+        <h2>抖音博主信息录入</h2>
+        
+        <div class="input-group">
+            <label>博主昵称:</label>
+            <input type="text" id="nickname" required pattern="^[\w\u4e00-\u9fa5!@#$%^&*()_+-=]+$" title="允许符号、字母、数字、汉字">
+        </div>
+        
+        <div class="input-group">
+            <label>抖音号:</label>
+            <input type="text" id="douyinId" required pattern="^[a-zA-Z0-9!@#$%^&*()_+-=]+$" title="允许字母、数字、符号">
+        </div>
+        
+        <div class="input-group">
+            <label>合作渠道:</label>
+            <input type="text" id="wechat" required pattern="^[\w\u4e00-\u9fa5!@#$%^&*()_+-=a-zA-Z0-9]+$" title="允许汉字、符号、字母、数字" value="暂无（私信）">
+        </div>
+        
+        <div class="input-group">
+            <label>视频风格:</label>
+            <input type="text" id="type" required pattern="^[\u4e00-\u9fa5!@#$%^&*()_+-=]+$" title="允许符号、汉字">
+        </div>
+        
+        <div class="input-group">
+            <label>粉丝数:</label>
+            <input type="number" id="fans" min="100" required>
+        </div>
+        
+        <div class="input-group">
+            <label>质量分:</label>
+            <input type="number" id="score" min="1" max="10" required>
+        </div>
+        
+        <div class="input-group">
+            <label>影响力:</label>
+            <select id="influence" required>
+                <option value="">请选择</option>
+                <option value="巅峰级">巅峰级</option>
+                <option value="超强级">超强级</option>
+                <option value="强级">强级</option>
+                <option value="中级">中级</option>
+                <option value="弱级">弱级</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label>最近更新:</label>
+            <select id="updateDate" required>
+                <option value="">请选择</option>
+                <option value="七天内">七天内</option>
+                <option value="一月内">一月内</option>
+                <option value="三月内">三月内</option>
+                <option value="半年内">半年内</option>
+            </select>
+        </div>
+        
+        </div>
+        <button onclick="saveRecord()">保存记录</button>
+
+        <div id="records">
+            <h2>已保存记录 <span style="font-size: smaller; color: #00ffe7;">（点击信息条可查看博主视频等详情）</span></h2>
+        <div class="sort-bar">
+            <label>排序方式：</label>
+            <select id="sortType" onchange="sortRecords()">
+                <option value="fans">粉丝数</option>
+                <option value="score">质量分</option>
+                <option value="influence">影响力</option>
+            </select>
+        </div>
+            <div id="loading" style="display: none; text-align: center; color: #00ffe7; padding: 10px;">正在加载...</div>
+            <table>
+                <thead>
+                    <tr>
+                    <th>序号</th>
+                    <th>博主昵称</th>
+                        <th>抖音号</th>
+                        <th>合作渠道</th>
+                        <th>视频风格</th>
+                        <th>粉丝数</th>
+                        <th>质量分</th>
+                        <th>影响力</th>
+                        <th>最近更新</th>
+                        <th class="action-cell">操作</th>
+                    </tr>
+                </thead>
+                <tbody id="recordList">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="particles" id="particles"></div>
+    <script>
+        let records = [];
+        const API_URL = 'http://localhost:3000';
+
+        async function loadRecords() {
+            try {
+                const response = await fetch(`${API_URL}/records`);
+                records = await response.json();
+                return records;
+            } catch (err) {
+                console.error('Error loading records:', err);
+                return [];
+            }
+        }
+
+        function validateInput() {
+            const inputs = document.querySelectorAll('input[required], select[required]');
+            for (let input of inputs) {
+                if (!input.value.trim() || !input.checkValidity()) {
+                    alert('请正确填写所有必填字段！' + (input.title ? ' ' + input.title : ''));
+                    return false;
+                }
+                if (input.type === 'number' && 
+                    (Number(input.value) < input.min || 
+                     Number(input.value) > (input.max || Infinity))) {
+                    alert(`请输入有效的${input.previousElementSibling.innerText.replace(':', '')}`);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        async function saveRecord() {
+            if (!validateInput()) return;
+
+            const record = {
+                nickname: document.getElementById('nickname').value,
+                douyinId: document.getElementById('douyinId').value,
+                wechat: document.getElementById('wechat').value,
+                type: document.getElementById('type').value,
+                fans: parseInt(document.getElementById('fans').value),
+                score: parseInt(document.getElementById('score').value),
+                influence: document.getElementById('influence').value,
+                updateDate: document.getElementById('updateDate').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/records`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(record)
+                });
+                if (response.ok) {
+                    await loadRecords();
+                    updateTable();
+                    clearInputs();
+                }
+            } catch (err) {
+                console.error('Error saving record:', err);
+            }
+        }
+
+        function clearInputs() {
+            document.querySelectorAll('input').forEach(input => {
+                if (input.type !== 'button') input.value = '';
+            });
+            document.getElementById('wechat').value = '暂无（私信）';
+            // 重置选择框
+            document.getElementById('influence').value = '';
+            document.getElementById('updateDate').value = '';
+        }
+
+        function updateTable() {
+            const tbody = document.getElementById('recordList');
+            tbody.innerHTML = '';
+            
+            records.forEach((record, index) => {
+            tbody.innerHTML += `
+                <tr onclick="window.open('https://www.douyin.com/search/' + encodeURIComponent('${record.douyinId}') + '?aid=bed2018d-6512-407b-8a1b-47bc351d2842&type=general', '_blank')">
+                    <td>${index + 1}</td>
+                    <td>${record.nickname}</td>
+                        <td>${record.douyinId}</td>
+                        <td>${record.wechat}</td>
+                        <td>${record.type}</td>
+                        <td>${record.fans.toLocaleString()}</td>
+                        <td>${record.score}</td>
+                        <td>${record.influence}</td>
+                        <td>${record.updateDate}</td>
+                        <td class="action-cell">
+                            <button class="delete-btn" onclick="event.stopPropagation(); deleteRecord('${record.id}')">删除</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        async function deleteRecord(id) {
+            if (confirm('确认要永久删除这条记录吗？')) {
+                try {
+                    const response = await fetch(`${API_URL}/records/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        await loadRecords();
+                        updateTable();
+                    }
+                } catch (err) {
+                    console.error('Error deleting record:', err);
+                }
+            }
+        }
+
+        async function sortRecords() {
+            document.getElementById('loading').style.display = 'block';
+            // 短暂延迟以确保加载指示器显示
+            await new Promise(resolve => setTimeout(resolve, 100));
+            const sortType = document.getElementById('sortType').value;
+            const influenceMap = {
+                '巅峰级': 5,
+                '超强级': 4,
+                '强级': 3,
+                '中级': 2,
+                '弱级': 1
+            };
+            records.sort((a, b) => {
+                let primaryDiff, secondaryDiff, tertiaryDiff;
+                if (sortType === 'influence') {
+                    primaryDiff = influenceMap[b.influence] - influenceMap[a.influence];
+                    secondaryDiff = b.score - a.score;
+                    tertiaryDiff = b.fans - a.fans;
+                } else if (sortType === 'score') {
+                    primaryDiff = b.score - a.score;
+                    secondaryDiff = influenceMap[b.influence] - influenceMap[a.influence];
+                    tertiaryDiff = b.fans - a.fans;
+                } else if (sortType === 'fans') {
+                    primaryDiff = b.fans - a.fans;
+                    secondaryDiff = b.score - a.score;
+                    tertiaryDiff = influenceMap[b.influence] - influenceMap[a.influence];
+                }
+                return primaryDiff !== 0 ? primaryDiff :
+                       secondaryDiff !== 0 ? secondaryDiff :
+                       tertiaryDiff;
+            });
+            updateTable();
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function createParticles() {
+            const particles = document.getElementById('particles');
+            const count = 32;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + 'vw';
+                p.style.animationDuration = (2.5 + Math.random() * 2.5) + 's';
+                p.style.opacity = 0.4 + Math.random() * 0.6;
+                p.style.width = p.style.height = (6 + Math.random() * 8) + 'px';
+                p.style.animationDelay = (Math.random() * 4) + 's';
+                particles.appendChild(p);
+            }
+        }
+
+        // 初始化
+        async function init() {
+            await loadRecords();
+            updateTable();
+            createParticles();
+        }
+        init();
+    </script>
+</body>
+</html>
