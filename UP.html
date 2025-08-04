@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>抖音博主管理系统</title>
+    <link rel="icon" href="logo.png" type="image/png">
     <style>
         /* 赛博背景样式 */
         .cyber-grid {
@@ -528,7 +529,7 @@
         
         <div class="input-group">
             <label>合作渠道:</label>
-            <input type="text" id="wechat" required pattern="^[\w\u4e00-\u9fa5!@#$%^&*()_+-=a-zA-Z0-9]+$" title="允许汉字、符号、字母、数字" value="暂无（私信）">
+            <input type="text" id="wechat" required pattern="^[\w\u4e00-\u9fa5!@#$%^&*()_+-=a-zA-Z0-9]+$" title="允许汉字、符号、字母、数字">
         </div>
         
         <div class="input-group">
@@ -708,7 +709,7 @@
             document.querySelectorAll('input').forEach(input => {
                 if (input.type !== 'button') input.value = '';
             });
-            document.getElementById('wechat').value = '暂无（私信）';
+            
             // 重置选择框
             document.getElementById('influence').value = '';
             document.getElementById('updateDate').value = '';
