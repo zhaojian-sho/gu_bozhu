@@ -17,6 +17,7 @@ function loadRecords() {
     saveRecords(records); // 保存更新后的记录
     return records;
   } catch (err) {
+    console.error('Error loading records:', err.message);
     return [];
   }
 }
@@ -75,14 +76,23 @@ const server = http.createServer((req, res) => {
       res.writeHead(404);
       res.end();
     }
-  } else if (req.method === 'PUT' && req.url === '/records') {
+  } else if (req.method === 'PUT' && req.url.startsWith('/records/')) {
+    const id = req.url.split('/')[2];
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', () => {
-      const newRecords = JSON.parse(body);
-      saveRecords(newRecords);
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true }));
+      const updatedRecord = JSON.parse(body);
+      const records = loadRecords();
+      const recordIndex = records.findIndex(r => r.id === id);
+      if (recordIndex !== -1) {
+        records[recordIndex] = updatedRecord;
+        saveRecords(records);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true }));
+      } else {
+        res.writeHead(404);
+        res.end();
+      }
     });
   } else {
     res.writeHead(404);

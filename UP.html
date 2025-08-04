@@ -177,6 +177,7 @@
             font-weight: bold;
             color: #00ffe7;
             text-shadow: 0 0 4px #00ffe7;
+            font-size: 16px;
         }
 
         input, select {
@@ -190,11 +191,39 @@
             font-size: 16px;
             box-shadow: 0 0 10px #00ffe750;
             transition: border 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
         }
 
         input:focus, select:focus {
             border: 2px solid #00c3ff;
             box-shadow: 0 0 20px #00c3ff80;
+        }
+
+        #searchInput:focus {
+            border: 2px solid #00c3ff !important;
+            box-shadow: 0 0 20px #00c3ff80 !important;
+        }
+
+        .clear-search-btn {
+            padding: 8px 16px;
+            background: linear-gradient(90deg, #00ffe7 0%, #00c3ff 100%);
+            color: #0f2027;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 20px #00ffe780, 0 0 8px #00c3ff60;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            margin-left: 10px;
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .clear-search-btn:hover {
+            background: linear-gradient(90deg, #00c3ff 0%, #00ffe7 100%);
+            color: #fff;
+            box-shadow: 0 0 40px #00ffe7, 0 0 16px #00c3ff;
         }
 
         /* 按钮样式 */
@@ -243,6 +272,9 @@
             vertical-align: middle;
             width: 10%;
             box-sizing: border-box;
+            word-wrap: break-word;
+            word-break: break-all;
+            white-space: normal;
         }
 
         .action-cell {
@@ -292,41 +324,181 @@
             100% { transform: translateY(-80px) scale(0.7); opacity: 0; }
         }
 
-        /* 删除按钮特效 */
-        .delete-btn {
+        /* 修改按钮特效 */
+        .edit-btn {
             padding: 8px 20px;
-            background: linear-gradient(135deg, #ff2a6d 0%, #7d2fff 100%);
-            color: #fff;
-            border: 1px solid #ff61fa;
+            background: linear-gradient(135deg, #00c3ff 0%, #00ffe7 100%);
+            color: #0f2027;
+            border: 1px solid #00ffe7;
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 15px #ff2a6d80, 
+            box-shadow: 0 0 15px #00c3ff80, 
                        inset 0 0 5px rgba(255,255,255,0.2);
             position: relative;
             overflow: hidden;
             font-family: 'Courier New', monospace;
             letter-spacing: 1px;
-            text-shadow: 0 0 5px #ff2a6d;
+            text-shadow: 0 0 5px #00c3ff;
+            font-weight: bold;
+            margin-top: 20px;
         }
 
-        .delete-btn:hover {
-            background: linear-gradient(135deg, #ff1a5e 0%, #6d1fff 100%);
-            box-shadow: 0 0 25px #ff2a6d, 
+        .edit-btn:hover {
+            background: linear-gradient(135deg, #0099cc 0%, #00ccb8 100%);
+            box-shadow: 0 0 25px #00c3ff, 
                        inset 0 0 10px rgba(255,255,255,0.3);
             transform: translateY(-2px) scale(1.02);
-            animation: btnGlow 1.5s infinite;
+            animation: editBtnGlow 1.5s infinite;
         }
 
-        @keyframes btnGlow {
-            0% { box-shadow: 0 0 15px #ff00ff, inset 0 0 5px rgba(255, 0, 255, 0.2); }
-            50% { box-shadow: 0 0 30px #ff00ff, inset 0 0 10px rgba(255, 0, 255, 0.3); }
-            100% { box-shadow: 0 0 15px #ff00ff, inset 0 0 5px rgba(255, 0, 255, 0.2); }
+        @keyframes editBtnGlow {
+            0% { box-shadow: 0 0 15px #00c3ff, inset 0 0 5px rgba(0, 195, 255, 0.2); }
+            50% { box-shadow: 0 0 30px #00c3ff, inset 0 0 10px rgba(0, 195, 255, 0.3); }
+            100% { box-shadow: 0 0 15px #00c3ff, inset 0 0 5px rgba(0, 195, 255, 0.2); }
         }
 
         .action-cell {
             width: 100px;
             text-align: center;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+            margin: 10% auto;
+            padding: 30px;
+            border: 2px solid #00ffe7;
+            border-radius: 15px;
+            width: 450px;
+            box-shadow: 0 0 40px #00ffe7a0, 0 0 0 2px #00ffe7 inset;
+            position: relative;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h3 {
+            color: #00ffe7;
+            text-shadow: 0 0 10px #00ffe7;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .modal-input-group {
+            margin-bottom: 20px;
+        }
+
+        .modal-input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00ffe7;
+            font-weight: bold;
+            text-shadow: 0 0 4px #00ffe7;
+        }
+
+        .modal-input-group input,
+        .modal-input-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #00ffe7;
+            border-radius: 8px;
+            background: rgba(10, 20, 30, 0.8);
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 0 10px #00ffe750;
+            box-sizing: border-box;
+        }
+
+        .modal-input-group input:focus,
+        .modal-input-group select:focus {
+            border: 2px solid #00c3ff;
+            box-shadow: 0 0 20px #00c3ff80;
+            outline: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .modal-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .modal-btn-confirm {
+            background: linear-gradient(90deg, #00ffe7 0%, #00c3ff 100%);
+            color: #0f2027;
+            box-shadow: 0 0 20px #00ffe780;
+        }
+
+        .modal-btn-confirm:hover {
+            background: linear-gradient(90deg, #00c3ff 0%, #00ffe7 100%);
+            box-shadow: 0 0 30px #00ffe7;
+            transform: translateY(-2px);
+        }
+
+        .modal-btn-cancel {
+            background: linear-gradient(90deg, #666 0%, #888 100%);
+            color: #fff;
+            box-shadow: 0 0 10px #66666680;
+        }
+
+        .modal-btn-cancel:hover {
+            background: linear-gradient(90deg, #888 0%, #aaa 100%);
+            box-shadow: 0 0 20px #888;
+            transform: translateY(-2px);
+        }
+
+        .close {
+            color: #00ffe7;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #00c3ff;
+            text-shadow: 0 0 10px #00c3ff;
         }
     </style>
 </head>
@@ -409,6 +581,9 @@
                 <option value="score">质量分</option>
                 <option value="influence">影响力</option>
             </select>
+            <label style="margin-left: 140px;">搜索：</label>
+            <input type="text" id="searchInput" placeholder="输入抖音号或博主昵称" oninput="searchRecords()" style="padding: 8px 12px; width: 200px; border: 2px solid #00ffe7; border-radius: 8px; background: rgba(10, 20, 30, 0.8); color: #fff; outline: none; font-size: 16px; box-shadow: 0 0 10px #00ffe750; transition: border 0.2s, box-shadow 0.2s; margin-left: 10px;">
+            <button onclick="clearSearch()" class="clear-search-btn">清除</button>
         </div>
             <div id="loading" style="display: none; text-align: center; color: #00ffe7; padding: 10px;">正在加载...</div>
             <table>
@@ -432,6 +607,36 @@
         </div>
     </div>
     <div class="particles" id="particles"></div>
+    
+    <!-- 修改模态框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <div class="modal-header">
+                <h3>修改博主信息</h3>
+            </div>
+            <div class="modal-input-group">
+                <label for="modalScore">质量分 (1-10):</label>
+                <input type="number" id="modalScore" min="1" max="10" required>
+            </div>
+            <div class="modal-input-group">
+                <label for="modalInfluence">影响力:</label>
+                <select id="modalInfluence" required>
+                    <option value="">请选择</option>
+                    <option value="弱级">弱级</option>
+                    <option value="中级">中级</option>
+                    <option value="强级">强级</option>
+                    <option value="超强级">超强级</option>
+                    <option value="巅峰级">巅峰级</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="closeEditModal()">取消</button>
+                <button class="modal-btn modal-btn-confirm" onclick="confirmEdit()">确定</button>
+            </div>
+        </div>
+    </div>
+    
     <script>
         let records = [];
         const API_URL = 'http://localhost:3000';
@@ -439,10 +644,15 @@
         async function loadRecords() {
             try {
                 const response = await fetch(`${API_URL}/records`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 records = await response.json();
+                console.log('Records loaded successfully:', records.length, 'records');
                 return records;
             } catch (err) {
                 console.error('Error loading records:', err);
+                records = []; // 确保在错误时也更新records变量
                 return [];
             }
         }
@@ -486,7 +696,7 @@
                 });
                 if (response.ok) {
                     await loadRecords();
-                    updateTable();
+                    searchRecords(); // 重新应用搜索过滤
                     clearInputs();
                 }
             } catch (err) {
@@ -505,27 +715,8 @@
         }
 
         function updateTable() {
-            const tbody = document.getElementById('recordList');
-            tbody.innerHTML = '';
-            
-            records.forEach((record, index) => {
-            tbody.innerHTML += `
-                <tr onclick="window.open('https://www.douyin.com/search/' + encodeURIComponent('${record.douyinId}') + '?aid=bed2018d-6512-407b-8a1b-47bc351d2842&type=general', '_blank')">
-                    <td>${index + 1}</td>
-                    <td>${record.nickname}</td>
-                        <td>${record.douyinId}</td>
-                        <td>${record.wechat}</td>
-                        <td>${record.type}</td>
-                        <td>${record.fans.toLocaleString()}</td>
-                        <td>${record.score}</td>
-                        <td>${record.influence}</td>
-                        <td>${record.updateDate}</td>
-                        <td class="action-cell">
-                            <button class="delete-btn" onclick="event.stopPropagation(); deleteRecord('${record.id}')">删除</button>
-                        </td>
-                    </tr>
-                `;
-            });
+            filteredRecords = [...records];
+            updateFilteredTable();
         }
 
         async function deleteRecord(id) {
@@ -534,12 +725,142 @@
                     const response = await fetch(`${API_URL}/records/${id}`, { method: 'DELETE' });
                     if (response.ok) {
                         await loadRecords();
-                        updateTable();
+                        searchRecords(); // 重新应用搜索过滤
                     }
                 } catch (err) {
                     console.error('Error deleting record:', err);
                 }
             }
+        }
+
+        let currentEditingId = null;
+
+        function editRecord(id) {
+            const record = records.find(r => r.id === id);
+            if (record) {
+                currentEditingId = id;
+                // 填充模态框数据
+                document.getElementById('modalScore').value = getDisplayScore(record);
+                document.getElementById('modalInfluence').value = getDisplayInfluence(record);
+                
+                // 显示模态框
+                document.getElementById('editModal').style.display = 'block';
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditingId = null;
+        }
+
+        async function confirmEdit() {
+            const newScore = parseInt(document.getElementById('modalScore').value);
+            const newInfluence = document.getElementById('modalInfluence').value;
+            
+            if (!newScore || newScore < 1 || newScore > 10 || !newInfluence) {
+                alert('请正确填写质量分(1-10)和影响力！');
+                return;
+            }
+            
+            const record = records.find(r => r.id === currentEditingId);
+            if (record) {
+                // 添加新的质量分和影响力记录
+                addScoreRecord(record, newScore);
+                addInfluenceRecord(record, newInfluence);
+                
+                try {
+                    const response = await fetch(`${API_URL}/records/${currentEditingId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(record)
+                    });
+                    if (response.ok) {
+                        await loadRecords();
+                        searchRecords(); // 重新应用搜索过滤
+                        closeEditModal();
+                    }
+                } catch (err) {
+                    console.error('Error updating record:', err);
+                }
+            }
+        }
+
+        function addScoreRecord(record, newScore) {
+            // 如果没有score1字段，说明这是第一次修改
+            if (!record.score1) {
+                record.score1 = record.score; // 保存原始分数
+                record.score2 = newScore;
+            } else {
+                // 找到下一个可用的score字段
+                let index = 1;
+                while (record[`score${index}`]) {
+                    index++;
+                }
+                record[`score${index}`] = newScore;
+            }
+        }
+
+        function addInfluenceRecord(record, newInfluence) {
+            // 如果没有influence1字段，说明这是第一次修改
+            if (!record.influence1) {
+                record.influence1 = record.influence; // 保存原始影响力
+                record.influence2 = newInfluence;
+            } else {
+                // 找到下一个可用的influence字段
+                let index = 1;
+                while (record[`influence${index}`]) {
+                    index++;
+                }
+                record[`influence${index}`] = newInfluence;
+            }
+        }
+
+        function getDisplayScore(record) {
+            let scores = [];
+            let index = 1;
+            
+            // 如果有score1，说明已经有多个版本
+            if (record.score1) {
+                while (record[`score${index}`]) {
+                    scores.push(record[`score${index}`]);
+                    index++;
+                }
+            } else {
+                // 只有原始score
+                scores.push(record.score);
+            }
+            
+            const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+            return Math.round(average * 10) / 10; // 保留一位小数
+        }
+
+        function getDisplayInfluence(record) {
+            const influenceMap = { '弱级': 1, '中级': 2, '强级': 3, '超强级': 4, '巅峰级': 5 };
+            const reverseMap = { 1: '弱级', 2: '中级', 3: '强级', 4: '超强级', 5: '巅峰级' };
+            
+            let influences = [];
+            let index = 1;
+            
+            // 如果有influence1，说明已经有多个版本
+            if (record.influence1) {
+                while (record[`influence${index}`]) {
+                    influences.push(influenceMap[record[`influence${index}`]]);
+                    index++;
+                }
+            } else {
+                // 只有原始influence
+                influences.push(influenceMap[record.influence]);
+            }
+            
+            const average = influences.reduce((sum, inf) => sum + inf, 0) / influences.length;
+            
+            // 四舍五入到最近的等级，如果正好在中间则选择更高等级
+            let roundedValue = Math.round(average);
+            if (average - Math.floor(average) === 0.5) {
+                roundedValue = Math.ceil(average); // 中间值向上取整
+            }
+            
+            return reverseMap[Math.max(1, Math.min(5, roundedValue))];
         }
 
         async function sortRecords() {
@@ -554,7 +875,7 @@
                 '中级': 2,
                 '弱级': 1
             };
-            records.sort((a, b) => {
+            filteredRecords.sort((a, b) => {
                 let primaryDiff, secondaryDiff, tertiaryDiff;
                 if (sortType === 'influence') {
                     primaryDiff = influenceMap[b.influence] - influenceMap[a.influence];
@@ -573,8 +894,65 @@
                        secondaryDiff !== 0 ? secondaryDiff :
                        tertiaryDiff;
             });
-            updateTable();
+            updateFilteredTable();
             document.getElementById('loading').style.display = 'none';
+        }
+
+        let filteredRecords = [];
+
+        function searchRecords() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                filteredRecords = [...records];
+            } else {
+                filteredRecords = records.filter(record => 
+                    record.nickname.toLowerCase().includes(searchTerm) ||
+                    record.douyinId.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            updateFilteredTable();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            filteredRecords = [...records];
+            updateFilteredTable();
+        }
+
+        function updateFilteredTable() {
+            const tbody = document.getElementById('recordList');
+            tbody.innerHTML = '';
+            
+            console.log('Updating table with filtered records:', filteredRecords);
+            
+            if (!filteredRecords || filteredRecords.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #00ffe7;">暂无匹配记录</td></tr>';
+                return;
+            }
+            
+            filteredRecords.forEach((record, index) => {
+                const displayScore = getDisplayScore(record);
+                const displayInfluence = getDisplayInfluence(record);
+                
+                tbody.innerHTML += `
+                    <tr onclick="window.open('https://www.douyin.com/search/' + encodeURIComponent('${record.douyinId}') + '?aid=bed2018d-6512-407b-8a1b-47bc351d2842&type=general', '_blank')">
+                        <td>${index + 1}</td>
+                        <td>${record.nickname}</td>
+                        <td>${record.douyinId}</td>
+                        <td>${record.wechat}</td>
+                        <td>${record.type}</td>
+                        <td>${record.fans.toLocaleString()}</td>
+                        <td>${displayScore}</td>
+                        <td>${displayInfluence}</td>
+                        <td>${record.updateDate}</td>
+                        <td class="action-cell">
+                            <button class="edit-btn" onclick="event.stopPropagation(); editRecord('${record.id}')">修改</button>
+                        </td>
+                    </tr>
+                `;
+            });
         }
 
         function createParticles() {
@@ -589,6 +967,14 @@
                 p.style.width = p.style.height = (6 + Math.random() * 8) + 'px';
                 p.style.animationDelay = (Math.random() * 4) + 's';
                 particles.appendChild(p);
+            }
+        }
+
+        // 点击模态框外部关闭模态框
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeEditModal();
             }
         }
 
